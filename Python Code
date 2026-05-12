@@ -1,0 +1,75 @@
+!pip install pandas mysql-connector-python sqlalchemy  
+import pandas as pd
+import mysql.connector
+from sqlalchemy import create_engine
+engine = create_engine("mysql+mysqlconnector://root:Anudip%40123@localhost/amz")
+df=pd.read_sql("SELECT * FROM e_data", engine)
+df.head()
+print(df.isnull().sum())
+df.dropna(inplace=True)
+df.drop_duplicates(inplace=True)
+df["Month"] = df["Purchase_Date"].dt.month_name()
+total_revenue = df["Final_Price"].sum()
+print("Total Revenue:", total_revenue)
+import numpy as np
+average_sales = np.mean(df["Final_Price"])
+print("Average Sales:", average_sales)
+top_categories = df["Category"].value_counts()
+print(top_categories)
+payment_analysis = df["Payment_Method"].value_counts()
+print(payment_analysis)
+monthly_revenue = df.groupby("Month")["Final_Price"].sum()
+print(monthly_revenue)
+import matplotlib.pyplot as plt
+category_sales = df.groupby("Category")["Final_Price"].sum()
+
+plt.figure(figsize=(8,5))
+plt.plot(category_sales.index, category_sales.values)
+plt.title("Category Sales Trend")
+plt.xlabel("Category")
+plt.ylabel("Final_Price")
+plt.show()
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, r2_score
+top_products = df.groupby("Category")["Price_Rs"].sum().head(10)
+
+plt.figure(figsize=(8,5))
+top_products.plot(kind='bar')
+plt.title("Top Selling Products")
+plt.xlabel("Category")
+plt.ylabel("Price_Rs")
+plt.show()
+
+payment_analysis = df["Payment_Method"].value_counts()
+
+plt.figure(figsize=(6,6))
+payment_analysis.plot(kind='pie', autopct='%1.1f%%')
+plt.title("Payment Method Distribution")
+plt.ylabel("")
+plt.show()
+
+monthly_revenue = df.groupby("Month")["Final_Price"].sum()
+
+plt.figure(figsize=(8,5))
+plt.plot(monthly_revenue.index, monthly_revenue.values)
+plt.title("Monthly Revenue Trend")
+plt.xlabel("Month")
+plt.ylabel("Revenue")
+plt.show()
+
+from sklearn.preprocessing import LabelEncoder
+label_encoder = LabelEncoder()
+df["Category"] = label_encoder.fit_transform(df["Category"])
+
+X = df[["Category", "Price_Rs", "Discount"]]
+y = df["Final_Price"]
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+model = LinearRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("Mean Absolute Error:", mean_absolute_error(y_test, y_pred))
+print("R2 Score:", r2_score(y_test, y_pred))
