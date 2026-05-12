@@ -1,0 +1,61 @@
+Use amz;
+SELECT * FROM e_data;
+DESCRIBE e_data;
+
+SELECT Category, Payment_Method
+FROM e_data;
+
+ALTER TABLE e_data
+CHANGE COLUMN `Price (Rs.)` Price_Rs DECIMAL(10,2);
+
+ALTER TABLE e_data
+CHANGE COLUMN `Final_Price(Rs.)` Final_Price DECIMAL(10,2);
+
+ALTER TABLE e_data
+CHANGE COLUMN `Discount (%)` Discount INT;
+
+SHOW COLUMNS FROM e_data;
+
+SELECT Price_Rs, Category
+FROM e_data
+WHERE Price_Rs>100;
+
+SELECT Payment_Method, Category
+FROM e_data
+WHERE "Payment_Method" = 'UPI';
+
+alter table e_data
+add ppl_level VARCHAR(50);
+
+SELECT * FROM e_data;
+SET SQL_SAFE_UPDATES = 0;
+UPDATE e_data
+set ppl_level = 'HIGH'
+where Final_Price > 300;
+
+select distinct Category,Final_Price
+from e_data
+where ppl_level is not null;
+
+SELECT COUNT(*) AS total_records
+FROM e_data;
+
+SELECT AVG(Final_Price) AS avg_price
+FROM e_data;
+
+SELECT MIN(User_ID) AS min_UID
+FROM e_data;
+
+SELECT MAX(User_Id) AS max_UID
+FROM e_data;
+
+SELECT Category, AVG(Final_Price) AS avg_FP
+FROM e_data
+WHERE Final_Price > 300
+GROUP BY Category;
+
+SELECT Category, SUM(Price_Rs) AS total_Price
+FROM e_data
+GROUP BY Category
+ORDER BY total_Price DESC;
+
